@@ -1,0 +1,41 @@
+*** ns-2.35/tcp/tcp.h	2011-08-26 12:29:57.000000000 -0700
+--- tcp/tcp.h	2012-03-19 02:40:10.049778005 -0700
+***************
+*** 104,110 ****
+  #define CWND_HALF_WITH_MIN	0x00000200
+  #define TCP_IDLE		0x00000400
+  #define NO_OUTSTANDING_DATA     0x00000800
+! 
+  /*
+   * tcp_tick_:
+   * default 0.1,
+--- 104,111 ----
+  #define CWND_HALF_WITH_MIN	0x00000200
+  #define TCP_IDLE		0x00000400
+  #define NO_OUTSTANDING_DATA     0x00000800
+! #define CLOSE_SSTHRESH_DCTCP   0x00001000
+! #define CLOSE_CWND_DCTCP       0x00002000
+  /*
+   * tcp_tick_:
+   * default 0.1,
+***************
+*** 432,437 ****
+  
+  	/* Used for ECN */
+  	int ecn_;		/* Explicit Congestion Notification */
+  	int cong_action_;	/* Congestion Action.  True to indicate
+  				   that the sender responded to congestion. */
+          int ecn_burst_;		/* True when the previous ACK packet
+--- 433,444 ----
+  
+  	/* Used for ECN */
+  	int ecn_;		/* Explicit Congestion Notification */
++ 	
++ 	/* Use for DCTCP */
++ 	int dctcp_;
++ 	double dctcp_alpha_;
++ 	double dctcp_g_;
++ 
+  	int cong_action_;	/* Congestion Action.  True to indicate
+  				   that the sender responded to congestion. */
+          int ecn_burst_;		/* True when the previous ACK packet

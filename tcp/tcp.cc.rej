@@ -1,0 +1,130 @@
+*** ns-2.35/tcp/tcp.cc	2011-06-19 21:51:46.000000000 -0700
+--- tcp/tcp.cc	2012-03-19 02:40:09.966778001 -0700
+***************
+*** 101,106 ****
+          bind("necnresponses_", &necnresponses_);
+          bind("ncwndcuts_", &ncwndcuts_);
+  	bind("ncwndcuts1_", &ncwndcuts1_);
+  #endif /* TCP_DELAY_BIND_ALL */
+  
+  }
+--- 101,109 ----
+          bind("necnresponses_", &necnresponses_);
+          bind("ncwndcuts_", &ncwndcuts_);
+  	bind("ncwndcuts1_", &ncwndcuts1_);
++ 	bind("dctcp_", &dctcp_);
++ 	bind("dctcp_alpha_", &dctcp_alpha_);
++ 	bind("dctcp_g_", &dctcp_g_);
+  #endif /* TCP_DELAY_BIND_ALL */
+  
+  }
+***************
+*** 123,128 ****
+          delay_bind_init_one("overhead_");
+          delay_bind_init_one("tcpTick_");
+          delay_bind_init_one("ecn_");
+          delay_bind_init_one("SetCWRonRetransmit_");
+          delay_bind_init_one("old_ecn_");
+          delay_bind_init_one("bugfix_ss_");
+--- 126,136 ----
+          delay_bind_init_one("overhead_");
+          delay_bind_init_one("tcpTick_");
+          delay_bind_init_one("ecn_");
++ 	// DCTCP
++ 	delay_bind_init_one("dctcp_"); 
++ 	delay_bind_init_one("dctcp_alpha_");
++ 	delay_bind_init_one("dctcp_g_");
++ 
+          delay_bind_init_one("SetCWRonRetransmit_");
+          delay_bind_init_one("old_ecn_");
+          delay_bind_init_one("bugfix_ss_");
+***************
+*** 234,239 ****
+          if (delay_bind(varName, localName, "overhead_", &overhead_, tracer)) return TCL_OK;
+          if (delay_bind(varName, localName, "tcpTick_", &tcp_tick_, tracer)) return TCL_OK;
+          if (delay_bind_bool(varName, localName, "ecn_", &ecn_, tracer)) return TCL_OK;
+          if (delay_bind_bool(varName, localName, "SetCWRonRetransmit_", &SetCWRonRetransmit_, tracer)) return TCL_OK;
+          if (delay_bind_bool(varName, localName, "old_ecn_", &old_ecn_ , tracer)) return TCL_OK;
+          if (delay_bind_bool(varName, localName, "bugfix_ss_", &bugfix_ss_ , tracer)) return TCL_OK;
+--- 242,251 ----
+          if (delay_bind(varName, localName, "overhead_", &overhead_, tracer)) return TCL_OK;
+          if (delay_bind(varName, localName, "tcpTick_", &tcp_tick_, tracer)) return TCL_OK;
+          if (delay_bind_bool(varName, localName, "ecn_", &ecn_, tracer)) return TCL_OK;
++ 	// Mohammad
++         if (delay_bind_bool(varName, localName, "dctcp_", &dctcp_, tracer)) return TCL_OK; 
++ 	if (delay_bind(varName, localName, "dctcp_alpha_", &dctcp_alpha_ , tracer)) return TCL_OK;
++ 	if (delay_bind(varName, localName, "dctcp_g_", &dctcp_g_ , tracer)) return TCL_OK;
+          if (delay_bind_bool(varName, localName, "SetCWRonRetransmit_", &SetCWRonRetransmit_, tracer)) return TCL_OK;
+          if (delay_bind_bool(varName, localName, "old_ecn_", &old_ecn_ , tracer)) return TCL_OK;
+          if (delay_bind_bool(varName, localName, "bugfix_ss_", &bugfix_ss_ , tracer)) return TCL_OK;
+***************
+*** 1297,1302 ****
+  		} else {
+  			ssthresh_ = (int) decreasewin;
+  		}
+          else if (how & THREE_QUARTER_SSTHRESH)
+  		if (ssthresh_ < 3*cwnd_/4)
+  			ssthresh_  = (int)(3*cwnd_/4);	
+--- 1309,1316 ----
+  		} else {
+  			ssthresh_ = (int) decreasewin;
+  		}
++ 	else if (how & CLOSE_SSTHRESH_DCTCP) 
++ 		ssthresh_ = (int) ((1 - dctcp_alpha_/2.0) * windowd())*0;
+          else if (how & THREE_QUARTER_SSTHRESH)
+  		if (ssthresh_ < 3*cwnd_/4)
+  			ssthresh_  = (int)(3*cwnd_/4);	
+***************
+*** 1306,1311 ****
+  		if (first_decrease_ == 1 || slowstart || decrease_num_ == 0.5) {
+  			cwnd_ = halfwin;
+  		} else cwnd_ = decreasewin;
+          else if (how & CWND_HALF_WITH_MIN) {
+  		// We have not thought about how non-standard TCPs, with
+  		// non-standard values of decrease_num_, should respond
+--- 1321,1328 ----
+  		if (first_decrease_ == 1 || slowstart || decrease_num_ == 0.5) {
+  			cwnd_ = halfwin;
+  		} else cwnd_ = decreasewin;
++ 	else if (how & CLOSE_CWND_DCTCP)
++ 		cwnd_ = (1 - dctcp_alpha_/2.0) * windowd()*0;
+          else if (how & CWND_HALF_WITH_MIN) {
+  		// We have not thought about how non-standard TCPs, with
+  		// non-standard values of decrease_num_, should respond
+***************
+*** 1328,1334 ****
+  	}
+  	if (ssthresh_ < 2)
+  		ssthresh_ = 2;
+! 	if (how & (CLOSE_CWND_HALF|CLOSE_CWND_RESTART|CLOSE_CWND_INIT|CLOSE_CWND_ONE))
+  		cong_action_ = TRUE;
+  
+  	fcnt_ = count_ = 0;
+--- 1345,1353 ----
+  	}
+  	if (ssthresh_ < 2)
+  		ssthresh_ = 2;
+! 	if (cwnd_ < 1)
+! 		cwnd_ = 1;
+! 	if (how & (CLOSE_CWND_HALF|CLOSE_CWND_RESTART|CLOSE_CWND_INIT|CLOSE_CWND_ONE|CLOSE_CWND_DCTCP))
+  		cong_action_ = TRUE;
+  
+  	fcnt_ = count_ = 0;
+***************
+*** 1429,1434 ****
+  				rtt_backoff();
+  			else ecn_backoff_ = 1;
+  		} else ecn_backoff_ = 0;
+  			slowdown(CLOSE_CWND_HALF|CLOSE_SSTHRESH_HALF);
+  		++necnresponses_ ;
+  		// added by sylvia to count number of ecn responses 
+--- 1448,1456 ----
+  				rtt_backoff();
+  			else ecn_backoff_ = 1;
+  		} else ecn_backoff_ = 0;
++ 		if (dctcp_)  
++ 			slowdown(CLOSE_CWND_DCTCP|CLOSE_SSTHRESH_DCTCP);
++ 		else
+  			slowdown(CLOSE_CWND_HALF|CLOSE_SSTHRESH_HALF);
+  		++necnresponses_ ;
+  		// added by sylvia to count number of ecn responses 

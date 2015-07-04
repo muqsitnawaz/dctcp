@@ -1,0 +1,19 @@
+*** ns-2.35/queue/red.cc	2011-10-02 15:32:34.000000000 -0700
+--- queue/red.cc	2012-03-19 02:40:10.827778003 -0700
+***************
+*** 559,565 ****
+  		edv_.count_bytes = 0;
+  		hdr_flags* hf = hdr_flags::access(pickPacketForECN(pkt));
+  		if (edp_.setbit && hf->ect() && 
+!                      (!edp_.use_mark_p || edv_.v_prob1 < edp_.mark_p)) { 
+  			hf->ce() = 1; 	// mark Congestion Experienced bit
+  			// Tell the queue monitor here - call emark(pkt)
+  			return (0);	// no drop
+--- 559,565 ----
+  		edv_.count_bytes = 0;
+  		hdr_flags* hf = hdr_flags::access(pickPacketForECN(pkt));
+  		if (edp_.setbit && hf->ect() && 
+! 		    (!edp_.use_mark_p || edv_.v_prob1 <= edp_.mark_p)) { // For DCTCP: '<' is changed to '<=' here  
+  			hf->ce() = 1; 	// mark Congestion Experienced bit
+  			// Tell the queue monitor here - call emark(pkt)
+  			return (0);	// no drop
