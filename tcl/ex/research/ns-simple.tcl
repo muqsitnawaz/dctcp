@@ -1,15 +1,181 @@
-#Create a simulator object
+# print flow function
+proc printFlow {f outfile fm interval} {
+	global ns
+	puts $outfile [format "%d %.6f " [$f set flowid_] [expr [$f set barrivals_]*8/($interval*1000000.)] ]
+
+	if 0 {
+		set flow(0) [open "flow0" a]
+		set flow(1) [open "flow1" a]
+		set flow(2) [open "flow2" a]
+		set flow(3) [open "flow3" a]
+		set flow(4) [open "flow4" a]
+		set flow(5) [open "flow5" a]
+		set flow(6) [open "flow6" a]
+		set flow(7) [open "flow7" a]
+		set flow(8) [open "flow8" a]
+		set flow(9) [open "flow9" a]
+		set flow(40) [open "flow40" a]
+		set flow(41) [open "flow41" a]
+		set flow(42) [open "flow42" a]
+		set flow(43) [open "flow43" a]
+	}
+
+	if 0 {
+		if { [$f set flowid_] == 0 } {
+			puts $flow(0) [format "%.4f %.6f" [$ns now] [expr [$f set barrivals_]*8/($interval*1000000.)] ]
+		}
+		if { [$f set flowid_] == 1 } {
+			puts $flow(1) [format "%.4f %.6f" [$ns now] [expr [$f set barrivals_]*8/($interval*1000000.)] ]
+		}
+		if { [$f set flowid_] == 2 } {
+			puts $flow(2) [format "%.4f %.6f" [$ns now] [expr [$f set barrivals_]*8/($interval*1000000.)] ]
+		}
+		if { [$f set flowid_] == 3 } {
+			puts $flow(3) [format "%.4f %.6f" [$ns now] [expr [$f set barrivals_]*8/($interval*1000000.)] ]
+		}
+		if { [$f set flowid_] == 4 } {
+			puts $flow(4) [format "%.4f %.6f" [$ns now] [expr [$f set barrivals_]*8/($interval*1000000.)] ]
+		}
+		if { [$f set flowid_] == 5 } {
+			puts $flow(5) [format "%.4f %.6f" [$ns now] [expr [$f set barrivals_]*8/($interval*1000000.)] ]
+		}
+		if { [$f set flowid_] == 6 } {
+			puts $flow(6) [format "%.4f %.6f" [$ns now] [expr [$f set barrivals_]*8/($interval*1000000.)] ]
+		}
+		if { [$f set flowid_] == 7 } {
+			puts $flow(7) [format "%.4f %.6f" [$ns now] [expr [$f set barrivals_]*8/($interval*1000000.)] ]
+		}
+		if { [$f set flowid_] == 8 } {
+			puts $flow(8) [format "%.4f %.6f" [$ns now] [expr [$f set barrivals_]*8/($interval*1000000.)] ]
+		}
+		if { [$f set flowid_] == 9 } {
+			puts $flow(9) [format "%.4f %.6f" [$ns now] [expr [$f set barrivals_]*8/($interval*1000000.)] ]
+		}
+		if { [$f set flowid_] == 40 } {
+			puts $flow(40) [format "%.4f %.6f" [$ns now] [expr [$f set barrivals_]*8/($interval*1000000.)] ]
+		}
+		if { [$f set flowid_] == 41 } {
+			puts $flow(41) [format "%.4f %.6f" [$ns now] [expr [$f set barrivals_]*8/($interval*1000000.)] ]
+		}
+		if { [$f set flowid_] == 42 } {
+			puts $flow(42) [format "%.4f %.6f" [$ns now] [expr [$f set barrivals_]*8/($interval*1000000.)] ]
+		}
+		if { [$f set flowid_] == 43 } {
+			puts $flow(43) [format "%.4f %.6f" [$ns now] [expr [$f set barrivals_]*8/($interval*1000000.)] ]
+		}
+	}
+
+	if 0 {
+		close $flow(0)
+		close $flow(1)
+		close $flow(2)
+		close $flow(3)
+		close $flow(4)
+		close $flow(5)
+		close $flow(6)
+		close $flow(7)
+		close $flow(8)
+		close $flow(9)
+		close $flow(40)
+		close $flow(41)
+		close $flow(42)
+		close $flow(43)
+	}
+
+}
+
+# flow dump function
+proc flowDump {link fm file_p interval} {
+    global ns 
+    $ns at [expr [$ns now] + $interval]  "flowDump $link $fm $file_p $interval"
+    puts $file_p [format "Time: %.4f" [$ns now]] 
+    set theflows [$fm flows]
+    if {[llength $theflows] == 0} {
+        return
+   		} else {
+           set total_arr [expr double([$fm set barrivals_])]
+         if {$total_arr > 0} {
+               foreach f $theflows {
+                   set arr [expr [expr double([$f set barrivals_])] / $total_arr]
+                   if {$arr >= 0.0001} {
+                    printFlow $f $file_p $fm $interval
+                }       
+                $f reset
+            }       
+            $fm reset
+        }
+    }
+}
+
+
+# DCTCP Initializations
+set N 8
+set B 250
+set K 65
+set RTT 0.0001
+
+set simulationTime 1.0
+
+set startMeasurementTime 1
+set stopMeasurementTime 2
+set flowClassifyTime 0.001
+
+set sourceAlg DC-TCP-Sack
+set switchAlg RED
+set lineRate 10Gb
+set inputLineRate 11Gb
+
+set DCTCP_g_ 0.0625
+set ackRatio 1 
+set packetSize 1460
+ 
+set traceSamplingInterval 0.0001
+set throughputSamplingInterval 0.01
+set enableNAM 1
+
+#creating new simulator object
 set ns [new Simulator]
-# Agent/TCP set cwnd_ 10 # (doesn't work)
+
+Agent/TCP set ecn_ 1
+Agent/TCP set old_ecn_ 1
+Agent/TCP set packetSize_ $packetSize
+Agent/TCP/FullTcp set segsize_ $packetSize
+Agent/TCP set slow_start_restart_ false
+Agent/TCP set tcpTick_ 0.01
+Agent/TCP set minrto_ 0.2 ; # minRTO = 200ms
+Agent/TCP set windowOption_ 0
+
+
+if {[string compare $sourceAlg "DC-TCP-Sack"] == 0} {
+    Agent/TCP set dctcp_ true
+    Agent/TCP set dctcp_g_ $DCTCP_g_;
+}
+Agent/TCP/FullTcp set segsperack_ $ackRatio; 
+Agent/TCP/FullTcp set spa_thresh_ 3000;
+Agent/TCP/FullTcp set interval_ 0.04 ; #delayed ACK interval = 40ms
+
+Queue set limit_ 1000
+
+Queue/RED set bytes_ false
+Queue/RED set queue_in_bytes_ true
+Queue/RED set mean_pktsize_ $packetSize
+Queue/RED set setbit_ true
+Queue/RED set gentle_ false
+Queue/RED set q_weight_ 1.0
+Queue/RED set mark_p_ 1.0
+Queue/RED set thresh_ [expr $K]
+Queue/RED set maxthresh_ [expr $K]
+			 
+DelayLink set avoidReordering_ true
 
 #Define different colors for data flows (for NAM)
 $ns color 1 Blue
 $ns color 2 Red
 
 #Open the NAM trace file
-set nf [open out.nam w]
+set nf [open myout.nam w]
 $ns namtrace-all $nf
-set enableNam 0
+set enableNam 1
 
 #Define a 'finish' procedure
 proc finish {} {
@@ -18,7 +184,7 @@ proc finish {} {
         #Close the NAM trace file
         close $nf
         #Execute NAM on the trace file
-        #exec nam out.nam &
+       	#exec nam out.nam &
         exit 0
 }
 
@@ -75,6 +241,16 @@ $cbr set type_ CBR
 $cbr set packet_size_ 1000
 $cbr set rate_ 1mb
 $cbr set random_ false
+
+
+# calling flow dump function
+set flowlink_file "flow.trace"
+set flow_file_ab [open $flowlink_file w];
+
+set fmon [$ns makeflowmon Fid]
+$fmon attach $flow_file_ab
+$ns attach-fmon [$ns link $n2 $n3] $fmon 0;
+$ns at 0 "flowDump [$ns link $n2 $n3] $fmon $flow_file_ab 0.08"
 
 
 #Schedule events for the CBR and FTP agents

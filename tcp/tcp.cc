@@ -432,23 +432,15 @@ TcpAgent::trace(TracedVar* v)
 // says to do.
 //
 
-void
-TcpAgent::set_initial_window()
-{
-	if (syn_ && delay_growth_) {
-		
-        // Added by us: START
-        cwnd_ = 10.0;
-
-        // Added by us: END
-		syn_connects_ = 0;
-	} else
-		cwnd_ = initial_window();
+void TcpAgent::set_initial_window() {
+    if (syn_ && delay_growth_) {
+        cwnd_ = 1.0;
+        syn_connects_ = 0;
+    } else
+        cwnd_ = initial_window();
 }
 
-void
-TcpAgent::reset_qoption()
-{
+void TcpAgent::reset_qoption() {
 	int now = (int)(Scheduler::instance().clock()/tcp_tick_ + 0.5);
 
 	T_start = now ; 
@@ -1141,7 +1133,7 @@ void TcpAgent::opencwnd() {
         //return;
     }
 
-    std::cout << ssthresh_  << " " << cwnd_ << " " << wnd_ << endl;
+    std::cout << ssthresh_  << " " << cwnd_ << endl;
 
     /*if (once == false) {
         cout << "value set!\n";
@@ -1560,10 +1552,10 @@ void TcpAgent::recv_newack_helper(Packet *pkt) {
  */
 double TcpAgent::initial_window() {
 
+        // Added by us: START
+        //return 1.0;
+        // Added by us: END
 
-    // Added by us : START
-    return 10.0;
-    // Added by us : END
 
         // If Quick-Start Request was approved, use that as a basis for
         // initial window

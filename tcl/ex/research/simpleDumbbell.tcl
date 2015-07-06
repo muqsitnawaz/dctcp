@@ -20,7 +20,7 @@ set packetSize 1460
  
 set traceSamplingInterval 0.0001
 set throughputSamplingInterval 0.01
-set enableNAM 1
+set enableNAM 0
 
 set ns [new Simulator]
 
@@ -82,7 +82,7 @@ proc myTrace {file} {
     
     set now [$ns now]
     
-    for {set i 0} {$i < $N - 1} {incr i} {
+    for {set i 0} {$i < $N} {incr i} {
 	set cwnd($i) [$tcp($i) set cwnd_]
 	set dctcp_alpha($i) [$tcp($i) set dctcp_alpha_]
     }
@@ -90,10 +90,10 @@ proc myTrace {file} {
     $qfile instvar parrivals_ pdepartures_ pdrops_ bdepartures_
   
     puts -nonewline $file "$now $cwnd(0)"
-    for {set i 1} {$i < $N - 1} {incr i} {
+    for {set i 1} {$i < $N} {incr i} {
 	puts -nonewline $file " $cwnd($i)"
     }
-    for {set i 0} {$i < $N - 1} {incr i} {
+    for {set i 0} {$i < $N} {incr i} {
 	puts -nonewline $file " $dctcp_alpha($i)"
     }
  
@@ -113,19 +113,19 @@ proc throughputTrace {file} {
     puts -nonewline $file "$now [expr $bdepartures_*8/$throughputSamplingInterval/1000000]"
     set bdepartures_ 0
     if {$now <= $flowClassifyTime} {
-	for {set i 0} {$i < [expr $N-2]} {incr i} {
+	for {set i 0} {$i < [expr $N-1]} {incr i} {
 	    puts -nonewline $file " 0"
 	}
 	puts $file " 0"
     }
 
     if {$now > $flowClassifyTime} { 
-	for {set i 0} {$i < [expr $N-2]} {incr i} {
+	for {set i 0} {$i < [expr $N-1]} {incr i} {
 	    $flowstats($i) instvar barrivals_
 	    puts -nonewline $file " [expr $barrivals_*8/$throughputSamplingInterval/1000000]"
 	    set barrivals_ 0
 	}
-	$flowstats([expr $N-2]) instvar barrivals_
+	$flowstats([expr $N-1]) instvar barrivals_
 	puts $file " [expr $barrivals_*8/$throughputSamplingInterval/1000000]"
 	set barrivals_ 0
     }
@@ -169,15 +169,15 @@ $ns duplex-link-op $nqueue $nclient queuePos 0.25
 set qfile [$ns monitor-queue $nqueue $nclient [open queue.tr w] $traceSamplingInterval]
 
 
-for {set i 0} {$i < $N - 1} {incr i} {
+for {set i 0} {$i < $N} {incr i} {
     if {[string compare $sourceAlg "Newreno"] == 0 || [string compare $sourceAlg "DC-TCP-Newreno"] == 0} {
-    	set tcp($i) [new Agent/TCP/Newreno]
-    	set sink($i) [new Agent/TCPSink]
+	set tcp($i) [new Agent/TCP/Newreno]
+	set sink($i) [new Agent/TCPSink]
     }
     if {[string compare $sourceAlg "Sack"] == 0 || [string compare $sourceAlg "DC-TCP-Sack"] == 0} { 
         set tcp($i) [new Agent/TCP/FullTcp/Sack]
-    	set sink($i) [new Agent/TCP/FullTcp/Sack]
-    	$sink($i) listen
+	set sink($i) [new Agent/TCP/FullTcp/Sack]
+	$sink($i) listen
     }
 
     $ns attach-agent $n($i) $tcp($i)
@@ -189,7 +189,7 @@ for {set i 0} {$i < $N - 1} {incr i} {
     $ns connect $tcp($i) $sink($i)       
 }
 
-for {set i 0} {$i < $N - 1} {incr i} {
+for {set i 0} {$i < $N} {incr i} {
     set ftp($i) [new Application/FTP]
     $ftp($i) attach-agent $tcp($i)    
 }
@@ -201,7 +201,7 @@ set ru [new RandomVariable/Uniform]
 $ru set min_ 0
 $ru set max_ 1.0
 
-for {set i 0} {$i < $N - 1} {incr i} {
+for {set i 0} {$i < $N} {incr i} {
     $ns at 0.0 "$ftp($i) send 10000"
     $ns at [expr 0.1 + $simulationTime * $i / ($N + 0.0001)] "$ftp($i) start"     
     $ns at [expr $simulationTime] "$ftp($i) stop"
@@ -220,7 +220,7 @@ proc classifyFlows {} {
     global N fcl flowstats
     puts "NOW CLASSIFYING FLOWS"
     for {set i 0} {$i < $N} {incr i} {
-	   set flowstats($i) [$fcl lookup autp 0 0 $i]
+	set flowstats($i) [$fcl lookup autp 0 0 $i]
     }
 } 
 
