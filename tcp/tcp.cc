@@ -41,6 +41,8 @@ static const char rcsid[] =
 #include <math.h>
 #include <sys/types.h>
 #include <iostream>
+#include <fstream>
+#include <cstdlib>
 #include "ip.h"
 #include "tcp.h"
 #include "flags.h"
@@ -433,18 +435,21 @@ TcpAgent::trace(TracedVar* v)
 // says to do.
 //
 
+double initcwnd_ = 0;
 void
 TcpAgent::set_initial_window()
 {
 
     if (syn_ && delay_growth_) {
         // added by us
-        cwnd_ = 100.0;
-        // added by us
 
+        // added by us
+        
+        cwnd_ = 1.0;
         syn_connects_ = 0;
     } else {
-        cwnd_ = initial_window();
+        initcwnd_ = initial_window();
+        cwnd_ = initcwnd_;
     }
 }
 
@@ -650,8 +655,7 @@ void TcpAgent::rtt_backoff()
  *      how big is an IP+TCP header in bytes; include options such as ts
  * this function should be virtual so others (e.g. SACK) can override
  */
-int TcpAgent::headersize()
-{
+int TcpAgent::headersize() {
         int total = tcpip_base_hdr_size_;
     if (total < 1) {
         fprintf(stderr,
@@ -818,8 +822,7 @@ void TcpAgent::output(int seqno, int reason)
  * If nbytes == -1, this corresponds to infinite send.  We approximate
  * infinite by a very large number (TCP_MAXSEQ).
  */
-void TcpAgent::sendmsg(int nbytes, const char* /*flags*/)
-{
+void TcpAgent::sendmsg(int nbytes, const char* /*flags*/) {
     if (nbytes == -1 && curseq_ <= TCP_MAXSEQ)
         curseq_ = TCP_MAXSEQ; 
     else
@@ -827,8 +830,7 @@ void TcpAgent::sendmsg(int nbytes, const char* /*flags*/)
     send_much(0, 0, maxburst_);
 }
 
-void TcpAgent::advanceby(int delta)
-{
+void TcpAgent::advanceby(int delta) {
   curseq_ += delta;
     if (delta > 0)
         closed_ = 0;
@@ -836,8 +838,7 @@ void TcpAgent::advanceby(int delta)
 }
 
 
-int TcpAgent::command(int argc, const char*const* argv)
-{
+int TcpAgent::command(int argc, const char*const* argv) {
     if (argc == 3) {
         if (strcmp(argv[1], "advance") == 0) {
             int newseq = atoi(argv[2]);
@@ -899,13 +900,11 @@ int TcpAgent::command(int argc, const char*const* argv)
  * Returns the window size adjusted to allow <num> segments past recovery
  * point to be transmitted on next ack.
  */
-int TcpAgent::force_wnd(int num)
-{
+int TcpAgent::force_wnd(int num) {
     return recover_ + num - (int)highest_ack_;
 }
 
-int TcpAgent::window()
-{
+int TcpAgent::window() {
         /*
          * If F-RTO is enabled and first ack has come in, temporarily open
          * window for sending two segments.
@@ -920,8 +919,7 @@ int TcpAgent::window()
         }
 }
 
-double TcpAgent::windowd()
-{
+double TcpAgent::windowd() {
     return (cwnd_ < wnd_ ? (double)cwnd_ : (double)wnd_);
 }
 
@@ -1135,6 +1133,13 @@ double TcpAgent::increase_param()
 /*
  * open up the congestion window
  */
+
+// added by us
+    //string temp_for_file_name = ftoa(initcwnd_);
+    //string outname = "output" + temp_for_file_name + ".txt";
+    ofstream out("output.txt");         // creating file in ns2.35 directory
+// added by us
+
 void TcpAgent::opencwnd()
 {
     // added by us
@@ -1143,7 +1148,8 @@ void TcpAgent::opencwnd()
         //return;
     }
 
-    cout << ssthresh_ << " " << cwnd_ <<  endl;
+    // cout << ssthresh_ << " " << cwnd_ <<  endl;      // priting cwnd size to screen
+    out << cwnd_ << endl;           // outputting data to the file
     // added by us
 
     double increment;
@@ -1556,11 +1562,7 @@ void TcpAgent::recv_newack_helper(Packet *pkt) {
  * Set the initial window. 
  */
 double
-TcpAgent::initial_window()
-{
-    // added by us
-    return 101.0;
-    // added by us
+TcpAgent::initial_window() {
 
         // If Quick-Start Request was approved, use that as a basis for
         // initial window

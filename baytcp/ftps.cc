@@ -35,23 +35,24 @@
  * This agent is paired with one or more ftp clients.
  * It expects to be the target of a FullTcpAgent.
  */
-static const char rcsid[] =
-    "@(#) $Header: /cvsroot/nsnam/ns-2/baytcp/ftps.cc,v 1.6 2001/09/06 22:09:41 haldar Exp $ ()";
+ static const char rcsid[] = "@(#) $Header: /cvsroot/nsnam/ns-2/baytcp/ftps.cc,v 1.6 2001/09/06 22:09:41 haldar Exp $ ()";
 
+#include <iostream>
 #include "tcp-full-bay.h"
 #include "tclcl.h"
 #include "random.h"
 #include "trace.h"
 #include "tcp.h"
+using namespace std;
 
 class FtpSrvrAgent : public BayTcpAppAgent {
- public:
-	FtpSrvrAgent();
-	int command(int argc, const char*const* argv);
-  void recv(Packet*, BayFullTcpAgent*, int code);
+public:
+ 	FtpSrvrAgent();
+ 	int command(int argc, const char*const* argv);
+ 	void recv(Packet*, BayFullTcpAgent*, int code);
   //void recv(Packet*, BayFullTcpAgent*);
 protected:
-	double now()  { return Scheduler::instance().clock(); }
+ 	double now()  { return Scheduler::instance().clock(); }
 	int min_response_;	//number of bytes in min response file
 	int max_response_;	//number of bytes in max response file
 	int filesize_; 		//file size in Bytes
@@ -79,24 +80,29 @@ FtpSrvrAgent::FtpSrvrAgent() : BayTcpAppAgent(PT_NTYPE)
 
 void FtpSrvrAgent::recv(Packet*, BayFullTcpAgent* tcp, int code)
 {
-  if(code == DATA_PUSH) {
-    int length = filesize_;
+	if(code == DATA_PUSH) {
+		int length = filesize_;
     //tells tcp-full with my mods to send FIN when empty
-    tcp->advance(length, 1);
-  }
+		tcp->advance(length, 1);
+	}
 }
 
 /*
  * set length
  */
-int FtpSrvrAgent::command(int argc, const char*const* argv)
-{
-	if (argc == 3) {
-		if (strcmp(argv[1], "file_size") == 0) {
-			filesize_ = atoi(argv[2]);
-			return (TCL_OK); 
-		}
-	} 
-	return (Agent::command(argc, argv));
-}
+ int FtpSrvrAgent::command(int argc, const char*const* argv)
+ {
+ 	if (argc == 3) {
+ 		if (strcmp(argv[1], "file_size") == 0) {
+ 			// added by us
+ 			cout << "Command Called!\n";
+ 			// added by us
+
+ 			filesize_ = atoi(argv[2]);
+ 			return (TCL_OK); 
+ 		}
+ 	}
+
+ 	return (Agent::command(argc, argv));
+ }
 

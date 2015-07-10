@@ -45,37 +45,37 @@
 /* events */
 #define NEW_FILE 0
 
-class FtpClientAgent;
+ class FtpClientAgent;
 
-class NewFileTimer : public TimerHandler {
-public:
-  NewFileTimer(FtpClientAgent *a) : TimerHandler() {a_ = a;}
-protected:
-  virtual void expire(Event *e);
-  FtpClientAgent *a_;
-};
+ class NewFileTimer : public TimerHandler {
+ public:
+ 	NewFileTimer(FtpClientAgent *a) : TimerHandler() {a_ = a;}
+ protected:
+ 	virtual void expire(Event *e);
+ 	FtpClientAgent *a_;
+ };
 
 
 /* added int to recv -kmn 6/8/00 */
 
-class FtpClientAgent : public BayTcpAppAgent {
+ class FtpClientAgent : public BayTcpAppAgent {
  public:
-	FtpClientAgent();
-	int command(int argc, const char*const* argv);
-	virtual void recv(Packet*, BayFullTcpAgent*, int);
+ 	FtpClientAgent();
+ 	int command(int argc, const char*const* argv);
+ 	virtual void recv(Packet*, BayFullTcpAgent*, int);
 	//virtual void recv(Packet*, BayFullTcpAgent*);
-        virtual void timeout(int);
+ 	virtual void timeout(int);
  protected:
 
-	void start();
-	void stop();
-	double now() { return Scheduler::instance().clock(); }
-	int sendget();
-	int running_;
-	double start_trans_;
-	int state_;
-	BayFullTcpAgent* tcp_;
-        NewFileTimer newfile_timer_;
-};
+ 	void start();
+ 	void stop();
+ 	double now() { return Scheduler::instance().clock(); }
+ 	int sendget();
+ 	int running_;
+ 	double start_trans_;
+ 	int state_;
+ 	BayFullTcpAgent* tcp_;
+ 	NewFileTimer newfile_timer_;
+ };
 
 #endif
