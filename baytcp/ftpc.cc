@@ -53,19 +53,23 @@ public:
 	}
 } class_ftpcli;
 
-FtpClientAgent::FtpClientAgent() : BayTcpAppAgent(PT_NTYPE), running_(0), newfile_timer_(this) {
+FtpClientAgent::FtpClientAgent() : BayTcpAppAgent(PT_NTYPE), running_(0), newfile_timer_(this)
+{
 }
 
-void FtpClientAgent::start() {
+void FtpClientAgent::start()
+{
 	running_ = 1;
 	newfile_timer_.resched(0.);
 }
 
-void FtpClientAgent::stop() {
+void FtpClientAgent::stop()
+{
 	running_ = 0;
 }
 
-void FtpClientAgent::timeout(int event_type) {
+void FtpClientAgent::timeout(int event_type)
+{
 	if (running_)
 		if(event_type == NEW_FILE)	{
 			if(sendget())	{
@@ -79,19 +83,21 @@ void FtpClientAgent::timeout(int event_type) {
 }
 
 //assumes 80 bytes
-int FtpClientAgent::sendget() {
+int FtpClientAgent::sendget()
+{
 	return tcp_->advance(80, 0);
 }
 
 //scheduled only when the tcp connection(s) are upcalling
 // ask for another file after a delay to allow connection to close
 // 6/8/00 shouldn't need the delay. Consider reducing or removing -kmn
-void FtpClientAgent::recv(Packet*, BayFullTcpAgent*, int code) {
+void FtpClientAgent::recv(Packet*, BayFullTcpAgent*, int code)
+{
   //at data complete time, schedule a "far out" event to ensure
   // simulator doesn't terminate
   if(running_ && code == DATA_PUSH) {
-	  state_ = DATA_RCVD;
-	  newfile_timer_.resched(5.0);
+  state_ = DATA_RCVD;
+  newfile_timer_.resched(5.0);
   }
   else if(running_ && code == CONNECTION_END) {
     state_ = END_RCVD;

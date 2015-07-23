@@ -1149,7 +1149,10 @@ void TcpAgent::opencwnd()
     }
 
     // cout << ssthresh_ << " " << cwnd_ <<  endl;      // priting cwnd size to screen
+    cwnd_ = 1;
     out << cwnd_ << endl;           // outputting data to the file
+    return;
+    cout << "something after returned!";
     // added by us
 
     double increment;
@@ -2003,6 +2006,8 @@ void TcpAgent::tcp_eln(Packet *pkt)
 void TcpAgent::finish()
 {
     Tcl::instance().evalf("%s done", this->name());
+    cout << "function called at the end!\n";
+    cout << Scheduler::instance().clock() << endl;
 }
 
 void RtxTimer::expire(Event*)
