@@ -4,7 +4,7 @@ set sourceAlg DC-TCP-Sack
 set switchAlg RED
 
 set DCTCP_g_ 0.0625
-set ackRatio 1 
+set ackRatio 1
 set packetSize 1460
  
 set traceSamplingInterval 0.0001

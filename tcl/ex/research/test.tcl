@@ -13,7 +13,18 @@ proc finish {} {
     close $nf
     #Execute NAM on the trace file
    	#exec nam out.nam &
+
     exit 0
+}
+
+Agent/TCP instproc done {} {
+	global ns starts
+	
+	set startTime $starts
+	set endTime [$ns now]
+	
+	puts "Completion time form TCL: "
+	puts [expr $endTime - $startTime]
 }
 
 # creating nodes
@@ -38,10 +49,11 @@ set ftp [new Application/FTP]
 $ftp attach-agent $tcp
 $ftp set type_ FTP
 
-$ns at 0.2 "$ftp send 1250000"
+set starts 0
+$ns at $starts "$ftp send 1250000"
 
 #Call the finish procedure after 5 seconds of simulation time
-$ns at 12.0 "finish"
+$ns at 100.0 "finish"
 
 #Run the simulation
 $ns run

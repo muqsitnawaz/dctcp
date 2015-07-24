@@ -1144,15 +1144,16 @@ void TcpAgent::opencwnd()
 {
     // added by us
     if (dctcp_) {
-        //cwnd_ = 0.0;
-        //return;
+        /*cout << cwnd_ << endl;          // outputting cwnd size to screen
+        cwnd_ = 50;
+        return;*/
     }
 
-    // cout << ssthresh_ << " " << cwnd_ <<  endl;      // priting cwnd size to screen
-    cwnd_ = 1;
-    out << cwnd_ << endl;           // outputting data to the file
-    return;
-    cout << "something after returned!";
+    out << cwnd_ << endl;               // outputting cwnd size to file
+    //cout << cwnd_ << endl;            // outputting cwnd size to screen
+
+    //cwnd_ = 1;
+    //return;
     // added by us
 
     double increment;
@@ -2003,11 +2004,12 @@ void TcpAgent::tcp_eln(Packet *pkt)
  * This function is invoked when the connection is done. It in turn
  * invokes the Tcl finish procedure that was registered with TCP.
  */
-void TcpAgent::finish()
-{
+void TcpAgent::finish() {
     Tcl::instance().evalf("%s done", this->name());
-    cout << "function called at the end!\n";
-    cout << Scheduler::instance().clock() << endl;
+
+    // added by us
+    cout << "Completion Time: " << Scheduler::instance().clock() << endl;
+    // added by us
 }
 
 void RtxTimer::expire(Event*)
