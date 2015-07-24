@@ -65,14 +65,14 @@ Agent/TCP instproc done {} {
 	puts [expr $endTime - $startTime]
 }
 
-#Agent/TCP set windowInit_ 10
+Agent/TCP set windowInit_ 5
 
 # creating nodes
 set n0 [$ns node]
 set n1 [$ns node]
 
 #Create links between the nodes
-$ns duplex-link $n0 $n1 5Mb 0.1ms DropTail
+$ns duplex-link $n0 $n1 500Mb 0.1ms DropTail
 
 #Setup a TCP connection
 set tcp [new Agent/TCP]

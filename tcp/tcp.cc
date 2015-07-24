@@ -41,6 +41,7 @@ static const char rcsid[] =
 #include <math.h>
 #include <sys/types.h>
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <cstdlib>
 #include "ip.h"
@@ -1144,10 +1145,11 @@ void TcpAgent::opencwnd()
 {
     // added by us
     if (dctcp_) {
-        /*cout << cwnd_ << endl;          // outputting cwnd size to screen
-        cwnd_ = 50;
-        return;*/
+        //cout << cwnd_ << endl;          // outputting cwnd size to screen
+        //cwnd_ = 6;
+        //return;
     }
+    //cout << "something her!";
 
     out << cwnd_ << endl;               // outputting cwnd size to file
     //cout << cwnd_ << endl;            // outputting cwnd size to screen
@@ -2004,11 +2006,18 @@ void TcpAgent::tcp_eln(Packet *pkt)
  * This function is invoked when the connection is done. It in turn
  * invokes the Tcl finish procedure that was registered with TCP.
  */
+
+// added by us
+ofstream out1("finish_times.txt");
+// added by us
+
+double finish_time = 0;
 void TcpAgent::finish() {
     Tcl::instance().evalf("%s done", this->name());
 
     // added by us
-    cout << "Completion Time: " << Scheduler::instance().clock() << endl;
+    out1 << here_.addr_ << "\t" << here_.port_ << "\t" << dst_.addr_ << "\t" << dst_.port_ << "\t";
+    out1 << setprecision(15) << Scheduler::instance().clock() << endl;
     // added by us
 }
 
