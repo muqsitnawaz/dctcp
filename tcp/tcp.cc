@@ -1139,14 +1139,28 @@ double TcpAgent::increase_param()
     //string temp_for_file_name = ftoa(initcwnd_);
     //string outname = "output" + temp_for_file_name + ".txt";
     ofstream out("output.txt");         // creating file in ns2.35 directory
-// added by us
+    const int CWND_RESET_VAL = 10;
+    int counter_for_reset = 0;
 
-void TcpAgent::opencwnd()
-{
+void TcpAgent::opencwnd() {
+    cout << "CWND: " << cwnd_ << endl;
+    return;
+
+    // incrementing counter
+    counter_for_reset += 1;
+    //cout << counter_for_reset << " " << cwnd_ << endl;
+
     // added by us
     if (dctcp_) {
         //cout << cwnd_ << endl;          // outputting cwnd size to screen
-        //cwnd_ = 6;
+        //cwnd_ = 5;
+        //return;
+
+        /*if (counter_for_reset % 10 == 0) {
+            //cout << counter_for_reset << " " << cwnd_ << " -YES" << endl;
+            cwnd_ = CWND_RESET_VAL;
+            return;
+        }*/
         //return;
     }
     //cout << "something her!";
@@ -1826,6 +1840,13 @@ int TcpAgent::lossQuickStart()
 void TcpAgent::recv(Packet *pkt, Handler*)
 {
     hdr_tcp *tcph = hdr_tcp::access(pkt);
+    
+    // added by us
+    double acked_cwnd_size = tcph->cwnd_size;
+    cout << "ACKed CWND size: " << acked_cwnd_size << endl;
+    cwnd_ = acked_cwnd_size;
+    // added by us
+
     int valid_ack = 0;
     if (qs_approved_ == 1 && tcph->seqno() > last_ack_) 
         endQuickStart();

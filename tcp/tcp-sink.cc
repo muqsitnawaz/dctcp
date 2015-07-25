@@ -34,10 +34,12 @@
  
 /* 8/02 Tom Kelly - Dynamic resizing of seen buffer */
 
+#include <iostream>
 #include "flags.h"
 #include "ip.h"
 #include "tcp-sink.h"
 #include "hdr_qs.h"
+using namespace std;
 
 static class TcpSinkClass : public TclClass {
 public:
@@ -263,6 +265,7 @@ void TcpSink::reset()
 				/* packets from previous incarnations */
 }
 
+double cwnd_size_to_ack = 0;
 void TcpSink::ack(Packet* opkt)
 {
 	Packet* npkt = allocpkt();
@@ -273,6 +276,12 @@ void TcpSink::ack(Packet* opkt)
 	hdr_tcp *otcp = hdr_tcp::access(opkt);
 	hdr_ip *oiph = hdr_ip::access(opkt);
 	hdr_tcp *ntcp = hdr_tcp::access(npkt);
+
+	// added by us
+	cout << "Input CWND_ size: ";
+	cin >> cwnd_size_to_ack;
+	ntcp->cwnd_size = cwnd_size_to_ack;		// setting cwnd_ size for source
+	// added by us
 
 	if (qs_enabled_) {
 		// QuickStart code from Srikanth Sundarrajan.

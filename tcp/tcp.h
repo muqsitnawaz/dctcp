@@ -55,6 +55,10 @@ struct hdr_tcp {
 	int tcp_flags_;         /* TCP flags for FullTcp */
 	int last_rtt_;		/* more recent RTT measurement in ms, */
 				/*   for statistics only */
+	
+	// added by us
+	int cwnd_size;
+	// added by us
 
 	static int offset_;	// offset for this header
 	inline static int& offset() { return offset_; }
