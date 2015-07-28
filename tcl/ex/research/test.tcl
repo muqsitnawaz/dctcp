@@ -50,7 +50,7 @@ $ftp attach-agent $tcp
 $ftp set type_ FTP
 
 set starts 0
-$ns at $starts "$ftp send 1250000"
+$ns at $starts "$ftp start"
 
 #Call the finish procedure after 5 seconds of simulation time
 $ns at 100.0 "finish"

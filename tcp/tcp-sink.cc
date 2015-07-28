@@ -278,8 +278,8 @@ void TcpSink::ack(Packet* opkt)
 	hdr_tcp *ntcp = hdr_tcp::access(npkt);
 
 	// added by us
-	cout << "Input CWND_ size: ";
-	cin >> cwnd_size_to_ack;
+	//cout << "Input CWND_ size: ";
+	//cin >> cwnd_size_to_ack;
 	ntcp->cwnd_size = cwnd_size_to_ack;		// setting cwnd_ size for source
 	// added by us
 

@@ -1144,6 +1144,7 @@ double TcpAgent::increase_param()
 
 void TcpAgent::opencwnd() {
     cout << "CWND: " << cwnd_ << endl;
+    cwnd_ = 0;
     return;
 
     // incrementing counter
@@ -1842,9 +1843,9 @@ void TcpAgent::recv(Packet *pkt, Handler*)
     hdr_tcp *tcph = hdr_tcp::access(pkt);
     
     // added by us
-    double acked_cwnd_size = tcph->cwnd_size;
-    cout << "ACKed CWND size: " << acked_cwnd_size << endl;
-    cwnd_ = acked_cwnd_size;
+    //double acked_cwnd_size = tcph->cwnd_size;
+    //cout << "ACKed CWND size: " << acked_cwnd_size << endl;
+    //cwnd_ = acked_cwnd_size;
     // added by us
 
     int valid_ack = 0;
