@@ -1143,10 +1143,6 @@ double TcpAgent::increase_param()
     int counter_for_reset = 0;
 
 void TcpAgent::opencwnd() {
-    cout << "CWND: " << cwnd_ << endl;
-    cwnd_ = 0;
-    return;
-
     // incrementing counter
     counter_for_reset += 1;
     //cout << counter_for_reset << " " << cwnd_ << endl;

@@ -176,9 +176,9 @@ proc build-tcp { n0 n1 startTime } {
 
     set ftp [new Application/FTP]
     $ftp attach-agent $tcp
-    $ns at $time_tcp "$tcp send"
-    set time_tcp [expr [$time_tcp + $time_increment]]
-    $ns at $startTime "$tcp flow_start"
+    $ftp set type_ FTP
+
+
     $ns at $startTime "$ftp start"
     
     $tcp set fid_ $f_id
