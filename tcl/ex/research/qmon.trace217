@@ -1,6 +1,6 @@
 Time interval: 0.000000-0.080000
 Link A-B: Utiliz=0.000 LossRate=0.000 AvgDelay=0.0ms AvgQueue(P)=0 AvgQueue(B)=0
 Time interval: 0.080000-0.160000
-Link A-B: Utiliz=0.354 LossRate=0.000 AvgDelay=0.8ms AvgQueue(P)=3 AvgQueue(B)=3414
+Link A-B: Utiliz=0.156 LossRate=0.000 AvgDelay=0.0ms AvgQueue(P)=0 AvgQueue(B)=21
 Time interval: 0.160000-0.240000
-Link A-B: Utiliz=1.000 LossRate=0.000 AvgDelay=0.6ms AvgQueue(P)=11 AvgQueue(B)=7300
+Link A-B: Utiliz=0.232 LossRate=0.000 AvgDelay=0.0ms AvgQueue(P)=0 AvgQueue(B)=136

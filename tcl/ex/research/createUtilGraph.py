@@ -1,3 +1,9 @@
+import math
+import pprint
+import random
+import os
+import commands
+
 # function for creating graphs from qmon.util* files
 def createGraphs():
     status, output = commands.getstatusoutput("find . -name qmon.util\*");
@@ -5,7 +11,7 @@ def createGraphs():
       
     for filename in mylist:
         filename = filename[2:]
-        plotter = open("qmon-util-plotter"+filename+".gp", 'w');
+        plotter = open("qmon-util-plotter"+filename[9:]+".gp", 'w');
 
         plotter.write("set terminal postscript color eps enhanced\n");
         plotter.write("set output \"plot-qmon-util"+filename[9:]+".ps\"\n");

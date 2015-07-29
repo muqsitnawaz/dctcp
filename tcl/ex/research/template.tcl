@@ -10,8 +10,8 @@ Classifier/MultiPath set perflow_ 1
 Classifier/MultiPath set checkpathid_ 1
 
 set STATS_START 0
-set STATS_INTR 0.08
-set interval 0.08
+set STATS_INTR 0.0003
+set interval 0.0003
 
 proc printFlow {f outfile fm interval} {
     global ns 
