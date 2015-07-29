@@ -127,7 +127,7 @@ proc flowDump {link fm file_p interval} {
 proc linkDump {link binteg pinteg qmon interval name linkfile util buf_bytes} {
     global ns
     set now_time [$ns now]
-    $ns at [expr $now_time + $interval] "linkDump $link $binteg $pinteg $qmon $interval $name $linkfile $util $loss $queue $buf_bytes"
+    $ns at [expr $now_time + $interval] "linkDump $link $binteg $pinteg $qmon $interval $name $linkfile $util $buf_bytes"
     set bandw [[$link link] set bandwidth_]
     set queue_bd [$binteg set sum_]
     set abd_queue [expr $queue_bd/[expr 1.*$interval]]
@@ -178,11 +178,7 @@ proc build-tcp { n0 n1 startTime } {
     $ftp attach-agent $tcp
     $ftp set type_ FTP
 
-
     $ns at $startTime "$ftp start"
-    
-    $tcp set fid_ $f_id
-    incr f_id
     return $tcp
 }
 
