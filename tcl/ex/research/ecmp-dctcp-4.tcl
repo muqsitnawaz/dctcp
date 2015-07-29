@@ -149,17 +149,12 @@ set tcp2 [build-tcp $n(2) $n(10) 0.13]
 set tcp3 [build-tcp $n(3) $n(11) 0.14]
 
 set tcp4 [build-tcp $n(4) $n(12) 0.15]
-set tcp5 [build-tcp $n(5) $n(13) 0.16]
+set tcp5 [build-tcp $n(5) $n(13) 0.1]
 set tcp6 [build-tcp $n(6) $n(14) 0.17]
-set tcp7 [build-tcp $n(7) $n(15) 0.18]
-
-set tcp8 [build-tcp $n(0) $n(12) 0.15]
-set tcp9 [build-tcp $n(13) $n(1) 0.16]
-set tcp10 [build-tcp $n(14) $n(2) 0.17]
-set tcp11 [build-tcp $n(8) $n(6) 0.18]
+set tcp7 [build-tcp $n(7) $n(15) 0.1]
 
 # exiting ns
-$ns at 0.26 "finish"
+$ns at 0.35 "finish"
 
 puts "running ns"
 $ns run
